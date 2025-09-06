@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Movie Search App</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    input, button { padding: 10px; margin: 5px; }
+    #movie-details { margin-top: 20px; }
+    .movie { margin-bottom: 15px; border: 1px solid #ccc; padding: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Movie Search App</h1>
+
+  <input type="text" id="search" placeholder="Enter movie title" />
+  <button onclick="searchMovie()">Search</button>
+
+  <div id="movie-details"></div>
+
+  <script>
+    async function searchMovie() {
+      const title = document.getElementById('search').value.trim();
+      if (!title) {
+        alert('Please enter a movie title.');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/movies?title=${encodeURIComponent(title)}`);
+        const data = await res.json();
+
+        if (data.Response === "False") {
+          document.getElementById('movie-details').innerHTML = `<p>Movie not found: ${data.Error}</p>`;
+          return;
+        }
+
+        // Display movie details
+        document.getElementById('movie-details').innerHTML = `
+          <div class="movie">
+            <h2>${data.Title} (${data.Year})</h2>
+            <p><strong>Genre:</strong> ${data.Genre}</p>
+            <p><strong>Cast:</strong> ${data.Actors}</p>
+            <p><strong>Plot:</strong> ${data.Plot}</p>
+            <p><strong>IMDB Rating:</strong> ${data.imdbRating}</p>
+          </div>
+        `;
+      } catch (error) {
+        document.getElementById('movie-details').innerHTML = `<p>Error fetching movie data.</p>`;
+        console.error(error);
+      }
+    }
+  </script>
+</body>
+</html>
